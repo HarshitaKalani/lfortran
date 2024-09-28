@@ -1,0 +1,56 @@
+Internal Compiler Error: Unhandled exception
+Traceback (most recent call last):
+[2m  Binary file "[0m[1m[35m$DIR/src/bin/lfortran[39m[0m[2m", in _start[0m
+[2m  File "[0m[1m[35m./csu/../csu/libc-start.c[39m[0m[2m", line 392, in __libc_start_main[0m
+[2m  File "[0m[1m[35m./csu/../sysdeps/nptl/libc_start_call_main.h[39m[0m[2m", line 58, in __libc_start_call_main[0m
+[2m  File "[0m[1m[35m$DIR/src/bin/lfortran.cpp[39m[0m[2m", line 2882, in main[0m
+    return main_app(argc, argv);
+[2m  File "[0m[1m[35m$DIR/src/bin/lfortran.cpp[39m[0m[2m", line 2749, in main_app(int, char**)[0m
+    return emit_wat(arg_file, compiler_options);
+[2m  File "[0m[1m[35m$DIR/src/bin/lfortran.cpp[39m[0m[2m", line 1318, in (anonymous namespace)::emit_wat(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, LCompilers::CompilerOptions&)[0m
+    LCompilers::Result<std::string> r = fe.get_wat(input, lm, diagnostics);
+[2m  File "[0m[1m[35m$DIR/src/lfortran/fortran_evaluator.cpp[39m[0m[2m", line 443, in LCompilers::FortranEvaluator::get_wat(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, LCompilers::LocationManager&, LCompilers::diag::Diagnostics&)[0m
+    Result<Vec<uint8_t>> wasm = get_wasm(code, lm, diagnostics);
+[2m  File "[0m[1m[35m$DIR/src/lfortran/fortran_evaluator.cpp[39m[0m[2m", line 430, in LCompilers::FortranEvaluator::get_wasm(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, LCompilers::LocationManager&, LCompilers::diag::Diagnostics&)[0m
+    return asr_to_wasm_bytes_stream(*asr.result, al, diagnostics, compiler_options);
+[2m  File "[0m[1m[35m$DIR/src/libasr/codegen/asr_to_wasm.cpp[39m[0m[2m", line 3392, in LCompilers::asr_to_wasm_bytes_stream(LCompilers::ASR::TranslationUnit_t&, Allocator&, LCompilers::diag::Diagnostics&, LCompilers::CompilerOptions&)[0m
+    v.visit_asr((ASR::asr_t &)asr);
+[2m  File "[0m[1m[35m$DIR/src/libasr/../libasr/asr.h[39m[0m[2m", line 5159, in LCompilers::ASR::BaseVisitor<LCompilers::ASRToWASMVisitor>::visit_asr(LCompilers::ASR::asr_t const&)[0m
+    void visit_asr(const asr_t &b) { visit_asr_t(b, self()); }
+[2m  File "[0m[1m[35m$DIR/src/libasr/../libasr/asr.h[39m[0m[2m", line 5135, in void LCompilers::ASR::visit_asr_t<LCompilers::ASRToWASMVisitor>(LCompilers::ASR::asr_t const&, LCompilers::ASRToWASMVisitor&)[0m
+    case asrType::unit: { v.visit_unit((const unit_t &)x); return; }
+[2m  File "[0m[1m[35m$DIR/src/libasr/../libasr/asr.h[39m[0m[2m", line 5160, in LCompilers::ASR::BaseVisitor<LCompilers::ASRToWASMVisitor>::visit_unit(LCompilers::ASR::unit_t const&)[0m
+    void visit_unit(const unit_t &b) { visit_unit_t(b, self()); }
+[2m  File "[0m[1m[35m$DIR/src/libasr/../libasr/asr.h[39m[0m[2m", line 4866, in void LCompilers::ASR::visit_unit_t<LCompilers::ASRToWASMVisitor>(LCompilers::ASR::unit_t const&, LCompilers::ASRToWASMVisitor&)[0m
+    case unitType::TranslationUnit: { v.visit_TranslationUnit((const TranslationUnit_t &)x); return; }
+[2m  File "[0m[1m[35m$DIR/src/libasr/codegen/asr_to_wasm.cpp[39m[0m[2m", line 795, in LCompilers::ASRToWASMVisitor::visit_TranslationUnit(LCompilers::ASR::TranslationUnit_t const&)[0m
+    declare_symbols(x);
+[2m  File "[0m[1m[35m$DIR/src/libasr/codegen/asr_to_wasm.cpp[39m[0m[2m", line 737, in LCompilers::ASRToWASMVisitor::declare_symbols(LCompilers::ASR::TranslationUnit_t const&)[0m
+    visit_symbol(*item.second);
+[2m  File "[0m[1m[35m$DIR/src/libasr/../libasr/asr.h[39m[0m[2m", line 5162, in LCompilers::ASR::BaseVisitor<LCompilers::ASRToWASMVisitor>::visit_symbol(LCompilers::ASR::symbol_t const&)[0m
+    void visit_symbol(const symbol_t &b) { visit_symbol_t(b, self()); }
+[2m  File "[0m[1m[35m$DIR/src/libasr/../libasr/asr.h[39m[0m[2m", line 4874, in void LCompilers::ASR::visit_symbol_t<LCompilers::ASRToWASMVisitor>(LCompilers::ASR::symbol_t const&, LCompilers::ASRToWASMVisitor&)[0m
+    case symbolType::Program: { v.visit_Program((const Program_t &)x); return; }
+[2m  File "[0m[1m[35m$DIR/src/libasr/codegen/asr_to_wasm.cpp[39m[0m[2m", line 850, in LCompilers::ASRToWASMVisitor::visit_Program(LCompilers::ASR::Program_t const&)[0m
+    this->visit_Function(*main_func);
+[2m  File "[0m[1m[35m$DIR/src/libasr/codegen/asr_to_wasm.cpp[39m[0m[2m", line 1190, in LCompilers::ASRToWASMVisitor::visit_Function(LCompilers::ASR::Function_t const&)[0m
+    emit_function_body(x);
+[2m  File "[0m[1m[35m$DIR/src/libasr/codegen/asr_to_wasm.cpp[39m[0m[2m", line 1140, in LCompilers::ASRToWASMVisitor::emit_function_body(LCompilers::ASR::Function_t const&)[0m
+    m_wa.emit_func_body(cur_sym_info.index, x.m_name, local_vars, [&](){
+[2m  File "[0m[1m[35m$DIR/src/libasr/../libasr/codegen/wasm_assembler.h[39m[0m[2m", line 316, in LCompilers::WASMAssembler::emit_func_body(unsigned int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::vector<LCompilers::wasm::var_type, std::allocator<LCompilers::wasm::var_type> >&, std::function<void ()>)[0m
+    func_body();
+[2m  File "[0m[1m[35m/usr/include/c++/11/bits/std_function.h[39m[0m[2m", line 590, in std::function<void ()>::operator()() const[0m
+    return _M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...);
+[2m  File "[0m[1m[35m/usr/include/c++/11/bits/std_function.h[39m[0m[2m", line 290, in std::_Function_handler<void (), LCompilers::ASRToWASMVisitor::emit_function_body(LCompilers::ASR::Function_t const&)::'lambda'()>::_M_invoke(std::_Any_data const&)[0m
+    return std::__invoke_r<_Res>(*_Base::_M_get_pointer(__functor),
+[2m  File "[0m[1m[35m/usr/include/c++/11/bits/invoke.h[39m[0m[2m", line 111, in std::enable_if<is_invocable_r_v<void, LCompilers::ASRToWASMVisitor::emit_function_body(LCompilers::ASR::Function_t const&)::'lambda'()&>, void>::type std::__invoke_r<void, LCompilers::ASRToWASMVisitor::emit_function_body(LCompilers::ASR::Function_t const&)::'lambda'()&>(LCompilers::ASRToWASMVisitor::emit_function_body(LCompilers::ASR::Function_t const&)::'lambda'()&)[0m
+    std::__invoke_impl<__type>(__tag{}, std::forward<_Callable>(__fn),
+[2m  File "[0m[1m[35m/usr/include/c++/11/bits/invoke.h[39m[0m[2m", line 61, in void std::__invoke_impl<void, LCompilers::ASRToWASMVisitor::emit_function_body(LCompilers::ASR::Function_t const&)::'lambda'()&>(std::__invoke_other, LCompilers::ASRToWASMVisitor::emit_function_body(LCompilers::ASR::Function_t const&)::'lambda'()&)[0m
+    { return std::forward<_Fn>(__f)(std::forward<_Args>(__args)...); }
+[2m  File "[0m[1m[35m$DIR/src/libasr/codegen/asr_to_wasm.cpp[39m[0m[2m", line 1143, in LCompilers::ASRToWASMVisitor::emit_function_body(LCompilers::ASR::Function_t const&)::'lambda'()::operator()() const[0m
+    this->visit_stmt(*x.m_body[i]);
+[2m  File "[0m[1m[35m$DIR/src/libasr/../libasr/asr.h[39m[0m[2m", line 5179, in LCompilers::ASR::BaseVisitor<LCompilers::ASRToWASMVisitor>::visit_stmt(LCompilers::ASR::stmt_t const&)[0m
+    void visit_stmt(const stmt_t &b) { visit_stmt_t(b, self()); }
+[2m  File "[0m[1m[35m$DIR/src/libasr/../libasr/asr.h[39m[0m[2m", line 4927, in void LCompilers::ASR::visit_stmt_t<LCompilers::ASRToWASMVisitor>(LCompilers::ASR::stmt_t const&, LCompilers::ASRToWASMVisitor&)[0m
+    case stmtType::IntrinsicImpureSubroutine: { v.visit_IntrinsicImpureSubroutine((const IntrinsicImpureSubroutine_t &)x); return; }
+LCompilersException: visit_IntrinsicImpureSubroutine() not implemented
