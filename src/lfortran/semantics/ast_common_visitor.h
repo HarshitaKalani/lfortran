@@ -4276,16 +4276,20 @@ public:
         ASR::ttype_t *type;
         type = ASRUtils::type_get_past_pointer(ASRUtils::symbol_type(f2));
         ASR::expr_t *arr_ref_val = nullptr;
+        ASR::expr_t *arr_ref_val_array = nullptr;
+        Vec<ASR::expr_t*> arr_1;
         bool all_args_eval = ASRUtils::all_args_evaluated(args);
         for( auto& a : args ) {
             // Assume that indices are constant integers
             int64_t start = 1, end = -1, step = 1;
+            std::vector<int64_t> end_array = {-1};
+            bool is_array = 0;
             bool flag = false;
             if( a.m_left ) {
                 if( all_args_eval ) {
                     ASR::expr_t* m_left_expr = ASRUtils::expr_value(a.m_left);
                     if (!ASR::is_a<ASR::IntegerConstant_t>(*m_left_expr)) {
-                        diag.add(Diagnostic("Substring start index at must be of type integer",
+                        diag.add(Diagnostic("Substring start index must be of type integer",
                             Level::Error, Stage::Semantic, {Label("", {m_left_expr->base.loc})}));
                         throw SemanticAbort();
                     }
@@ -4297,13 +4301,29 @@ public:
                 if( all_args_eval ) {
                     flag = true;
                     ASR::expr_t* m_right_expr = ASRUtils::expr_value(a.m_right);
-                    if(!ASR::is_a<ASR::IntegerConstant_t>(*m_right_expr)) {
-                        diag.add(Diagnostic("Substring end index at must be of type integer",
+                    if (ASR::is_a<ASR::ArrayConstant_t>(*m_right_expr)) {
+                        is_array = 1;
+                        ASR::ArrayConstant_t* ac = ASR::down_cast<ASR::ArrayConstant_t>(m_right_expr);
+                        int64_t arr_size = 0;
+                        arr_size = ASRUtils::get_fixed_size_of_array(ac->m_type);
+                        arr_1.reserve(al, arr_size);
+                        for(int i = 0; i<arr_size; i++) {
+                            ASR::expr_t* m_right_expr_1 = ASRUtils::fetch_ArrayConstant_value(al, ac, i);
+                            if(!ASR::is_a<ASR::IntegerConstant_t>(*m_right_expr_1)) {
+                                diag.add(Diagnostic("Substring end index must be of type integer",
+                                    Level::Error, Stage::Semantic, {Label("", {m_right_expr_1->base.loc})}));
+                                throw SemanticAbort();
+                            }
+                            end_array.push_back(ASR::down_cast<ASR::IntegerConstant_t>(m_right_expr_1)->m_n);
+                        }
+                    } else if(!ASR::is_a<ASR::IntegerConstant_t>(*m_right_expr)) {
+                        diag.add(Diagnostic("Substring end index must be of type integer",
                             Level::Error, Stage::Semantic, {Label("", {m_right_expr->base.loc})}));
                         throw SemanticAbort();
+                    } else {
+                        ASR::IntegerConstant_t *m_right = ASR::down_cast<ASR::IntegerConstant_t>(m_right_expr);
+                        end = m_right->m_n;
                     }
-                    ASR::IntegerConstant_t *m_right = ASR::down_cast<ASR::IntegerConstant_t>(m_right_expr);
-                    end = m_right->m_n;
                 }
             }
             if( a.m_step ) {
@@ -4330,20 +4350,52 @@ public:
                             Level::Error, Stage::Semantic, {Label("", {loc})}));
                         throw SemanticAbort();
                     }
-                    if(end > str_length) {
-                        diag.add(Diagnostic("Substring end index exceeds the string length",
-                            Level::Error, Stage::Semantic, {Label("", {loc})}));
-                        throw SemanticAbort();
-                    }
-                    if( end == -1 && !flag ) {
-                        end = str_length;
-                    } else {
-                        for( int i = start - 1; i < end; i += step ) {
-                            sliced_str.push_back(m_str->m_s[i]);
+                    if (!is_array) {
+                        if(end > str_length) {
+                            diag.add(Diagnostic("Substring end index exceeds the string length",
+                                Level::Error, Stage::Semantic, {Label("", {loc})}));
+                            throw SemanticAbort();
+                        } 
+                        if( end == -1 && !flag ) {
+                            end = str_length;
+                        } else {
+                            for( int i = start - 1; i < end; i += step ) {
+                                sliced_str.push_back(m_str->m_s[i]);
+                            }
+                            Str l_str;
+                            l_str.from_str(al, sliced_str);
+                            arr_ref_val = ASRUtils::EXPR(ASR::make_StringConstant_t(al, loc, l_str.c_str(al), m_str->m_type));
                         }
-                        Str l_str;
-                        l_str.from_str(al, sliced_str);
-                        arr_ref_val = ASRUtils::EXPR(ASR::make_StringConstant_t(al, loc, l_str.c_str(al), m_str->m_type));
+                    } else {
+                        for (const auto &end_index : end_array) {
+                            if (end_index > str_length) {
+                                diag.add(Diagnostic("Substring end index exceeds the string length",
+                                    Level::Error, Stage::Semantic, {Label("", {loc})}));
+                                throw SemanticAbort();
+                            }
+                        }
+                        if (end_array[0] == -1) {
+                            std::fill(end_array.begin(), end_array.end(), str_length);
+                        } else {
+                            for (int j = 0; j < (int)end_array.size(); ++j) {
+                                end = end_array[j];
+                                for( int i = start - 1; i < end; i += step ) {
+                                    sliced_str.push_back(m_str->m_s[i]);
+                                }
+                                Str l_str;
+                                l_str.from_str(al, sliced_str);
+                                sliced_str = "";
+                                arr_ref_val = ASRUtils::EXPR(ASR::make_StringConstant_t(al, loc, l_str.c_str(al), m_str->m_type));
+                                arr_1.push_back(al, arr_ref_val);
+                            }
+                            ASR::ttype_t* int_type = ASRUtils::TYPE(ASR::make_Integer_t(al, loc, compiler_options.po.default_integer_kind));
+                            ASR::dimension_t* array_dims = nullptr;
+                            int array_rank = ASRUtils::extract_dimensions_from_ttype(int_type, array_dims);
+                            arr_ref_val_array = ASRUtils::EXPR(ASR::make_ArrayConstant_t(al, loc, arr_1.size(),
+                            ASRUtils::set_ArrayConstant_data(arr_1.p, arr_1.n, int_type),
+                            ASRUtils::TYPE(ASR::make_Array_t(al, loc, int_type, array_dims, array_rank, ASR::array_physical_typeType::FixedSizeArray)),
+                                ASR::arraystorageType::ColMajor));
+                        } 
                     }
                 }
             }
@@ -4356,11 +4408,15 @@ public:
                 type = ASR::down_cast<ASR::StructInstanceMember_t>(v_Var)->m_type;
             }
             type = ASRUtils::duplicate_type(al, type, &empty_dims);
+            std::cout<<"args.size(): "<<args.size()<<'\n';
             if (arr_ref_val == nullptr) {
+                std::cout<<"here1"<<'\n';
                 // For now we will only handle 1D arrays
                 if (args.size() == 1) {
+                    std::cout<<"here2"<<'\n';
                     ASR::array_index_t arg = args[0];
                     if (arg.m_left == nullptr && arg.m_step == nullptr) {
+                        std::cout<<"here3"<<'\n';
                         ASR::expr_t *val = ASRUtils::expr_value(v_Var);
                         ASR::expr_t *index = ASRUtils::expr_value(arg.m_right);
                         if (val && index) {
@@ -4382,6 +4438,7 @@ public:
             }
             if( ASRUtils::is_character(*root_v_type) &&
                 !ASRUtils::is_array(root_v_type) ) {
+                    std::cout<<"here4"<<'\n';
                 ASR::ttype_t  *char_type = ASRUtils::TYPE(ASR::make_String_t(
                     al, type->base.loc, 1, 1, nullptr, ASR::string_physical_typeType::PointerString));
                 if(ASRUtils::is_descriptorString(ASRUtils::expr_type(v_Var))){
@@ -4392,6 +4449,7 @@ public:
             } else if ( ASRUtils::is_character(*root_v_type) &&
                         ASRUtils::is_array(root_v_type) &&
                         n_subargs > 0) {
+                            std::cout<<"here5"<<'\n';
                 ASR::expr_t* array_item = replace_with_common_block_variables(ASRUtils::EXPR(ASRUtils::make_ArrayItem_t_util(al, loc,
                     v_Var, args.p, args.size(), ASRUtils::type_get_past_pointer(
                         ASRUtils::type_get_past_allocatable(type)),
@@ -4420,10 +4478,17 @@ public:
                 return ASR::make_StringSection_t(al, loc, array_item, l,
                         r, ASRUtils::EXPR(tmp), char_type, arr_ref_val);
             } else {
-                return (ASR::asr_t*) replace_with_common_block_variables(ASRUtils::EXPR(ASRUtils::make_ArrayItem_t_util(al, loc,
+                std::cout<<"here6"<<'\n';
+                if (arr_ref_val) {
+                    std::cout<<"here7"<<'\n';
+                    return (ASR::asr_t*) replace_with_common_block_variables(ASRUtils::EXPR(ASRUtils::make_ArrayItem_t_util(al, loc,
                     v_Var, args.p, args.size(), ASRUtils::type_get_past_pointer(
                         ASRUtils::type_get_past_allocatable(type)),
                     ASR::arraystorageType::ColMajor, arr_ref_val)));
+                } else {
+                    std::cout<<"here8"<<'\n';
+                    return (ASR::asr_t*) replace_with_common_block_variables(arr_ref_val_array);
+                } 
             }
         } else {
             ASR::ttype_t *v_type = ASRUtils::symbol_type(v);
@@ -7448,6 +7513,7 @@ public:
                 if (x.m_member[0].n_args > 0) {
                     ASR::symbol_t *v1 = current_scope->resolve_symbol(to_lower(x.m_member[0].m_name));
                     ASR::symbol_t *f2 = ASRUtils::symbol_get_past_external(v1);
+                    std::cout<<"yaha1"<<'\n';
                     tmp = create_ArrayRef(x.base.base.loc, x.m_member[0].m_args, x.m_member[0].n_args, nullptr, 0, nullptr, v1, f2);
                 } else {
                     tmp = resolve_variable(x.base.base.loc, to_lower(x.m_member[0].m_name));
@@ -7794,6 +7860,7 @@ public:
             switch (f2->type) {
             case(ASR::symbolType::Variable): {
                 // TODO: Make create_StringRef for character (non-array) variables.
+                std::cout<<"yaha2"<<'\n';
                 tmp = create_ArrayRef(x.base.base.loc, x.m_args, x.n_args,
                                       x.m_subargs, x.n_subargs, v_expr, v, f2);
                 break;
