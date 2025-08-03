@@ -507,9 +507,7 @@
                                             StringTrim
                                             [(Var 3 s)]
                                             0
-                                            (Allocatable
-                                                (String 1 () DeferredLength DescriptorString)
-                                            )
+                                            (String 1 () AssumedLength DescriptorString)
                                             ()
                                         )
                                         ()

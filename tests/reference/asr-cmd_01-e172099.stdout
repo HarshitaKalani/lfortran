@@ -107,21 +107,11 @@
                         0
                     )
                     (Print
-                        (StringFormat
-                            ()
-                            [(IntrinsicElementalFunction
-                                StringTrim
-                                [(Var 2 arg)]
-                                0
-                                (Allocatable
-                                    (String 1 () DeferredLength DescriptorString)
-                                )
-                                ()
-                            )]
-                            FormatFortran
-                            (Allocatable
-                                (String 1 () DeferredLength DescriptorString)
-                            )
+                        (IntrinsicElementalFunction
+                            StringTrim
+                            [(Var 2 arg)]
+                            0
+                            (String 1 (IntegerConstant 32 (Integer 4) Decimal) ExpressionLength DescriptorString)
                             ()
                         )
                     )]

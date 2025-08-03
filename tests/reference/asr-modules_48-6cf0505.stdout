@@ -1374,9 +1374,7 @@
                                             StringTrim
                                             [(Var 6 line)]
                                             0
-                                            (Allocatable
-                                                (String 1 () DeferredLength DescriptorString)
-                                            )
+                                            (String 1 () AssumedLength DescriptorString)
                                             ()
                                         )
                                         ()

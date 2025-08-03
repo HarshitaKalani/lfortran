@@ -1231,9 +1231,7 @@
                                                         ()
                                                     )]
                                                     0
-                                                    (Allocatable
-                                                        (String 1 () DeferredLength DescriptorString)
-                                                    )
+                                                    (String 1 () DeferredLength DescriptorString)
                                                     ()
                                                 )
                                                 (Allocatable

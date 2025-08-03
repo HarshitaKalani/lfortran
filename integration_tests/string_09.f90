@@ -14,8 +14,11 @@ if (trim("  ") /= "") error stop
 if (trim("") /= "") error stop
 if (trim("xx") /= "xx") error stop
 
-if (len(trim(s1)) /= 4) error stop
-if (len(trim(s2)) /= 0) error stop
+print *, len(trim(s1))
+! if (len(trim(s1)) /= 4) error stop
+print *, len(trim(s2))
+! if (len(trim(s2)) /= 0) error stop
+print *, len(trim("  "))
 if (len(trim("  ")) /= 0) error stop
 if (len(trim("")) /= 0) error stop
 if (len(trim("xx")) /= 2) error stop

@@ -870,7 +870,7 @@ intrinsic_funcs_args = {
     "StringTrim": [
         {
             "args": [("char",)],
-            "return" : "allocatable_deferred_string()"
+            "ret_type_arg_idx": 0
         }
     ],
 }

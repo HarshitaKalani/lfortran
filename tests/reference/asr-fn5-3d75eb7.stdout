@@ -93,9 +93,7 @@
                                                                 StringTrim
                                                                 [(Var 3 line)]
                                                                 0
-                                                                (Allocatable
-                                                                    (String 1 () DeferredLength DescriptorString)
-                                                                )
+                                                                (String 1 () AssumedLength DescriptorString)
                                                                 ()
                                                             )
                                                             (Integer 4)
@@ -138,9 +136,7 @@
                                                         ()
                                                     )]
                                                     0
-                                                    (Allocatable
-                                                        (String 1 () DeferredLength DescriptorString)
-                                                    )
+                                                    (String 1 () AssumedLength DescriptorString)
                                                     ()
                                                 )
                                                 (Integer 4)
@@ -510,9 +506,7 @@
                                                                 (String 1 (IntegerConstant 7 (Integer 4) Decimal) ExpressionLength DescriptorString)
                                                             )]
                                                             0
-                                                            (Allocatable
-                                                                (String 1 () DeferredLength DescriptorString)
-                                                            )
+                                                            (String 1 () AssumedLength DescriptorString)
                                                             ()
                                                         )
                                                         (Integer 4)
@@ -640,9 +634,7 @@
                                                                     ()
                                                                 )]
                                                                 0
-                                                                (Allocatable
-                                                                    (String 1 () DeferredLength DescriptorString)
-                                                                )
+                                                                (String 1 () AssumedLength DescriptorString)
                                                                 ()
                                                             )
                                                             (Integer 4)
@@ -760,9 +752,7 @@
                                                                     ()
                                                                 )]
                                                                 0
-                                                                (Allocatable
-                                                                    (String 1 () DeferredLength DescriptorString)
-                                                                )
+                                                                (String 1 () AssumedLength DescriptorString)
                                                                 ()
                                                             )
                                                             (Integer 4)
