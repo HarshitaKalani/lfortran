@@ -5888,9 +5888,14 @@ public:
         } else {
             if (v->m_storage == ASR::storage_typeType::Save
                 && v->m_value
-                && (ASR::is_a<ASR::Integer_t>(*v->m_type)
+                && ((ASR::is_a<ASR::Integer_t>(*v->m_type)
                 || ASR::is_a<ASR::Real_t>(*v->m_type)
-                || ASR::is_a<ASR::Logical_t>(*v->m_type)) && !v->m_is_volatile) {
+                || ASR::is_a<ASR::Logical_t>(*v->m_type))
+                || (ASR::is_a<ASR::ArrayConstant_t>(*v->m_value)
+                && ASRUtils::is_array(v->m_type)
+                && ASRUtils::extract_physical_type(v->m_type)
+                    == ASR::array_physical_typeType::FixedSizeArray))
+                && !v->m_is_volatile) {
                 // Do nothing, the value is already initialized
                 // in the global variable
             } else {
@@ -6056,6 +6061,13 @@ public:
                             || ASR::is_a<ASR::Logical_t>(*v->m_type))) {
                         this->visit_expr(*v->m_value);
                         init_value = llvm::dyn_cast<llvm::Constant>(tmp);
+                    } else if (v->m_value
+                            && ASR::is_a<ASR::ArrayConstant_t>(*v->m_value)
+                            && ASRUtils::is_array(v->m_type)
+                            && ASRUtils::extract_physical_type(v->m_type)
+                                == ASR::array_physical_typeType::FixedSizeArray) {
+                        llvm::Type* el_type = type->getArrayElementType();
+                        init_value = get_const_array(v->m_value, el_type);
                     } else {
                         init_value = llvm::Constant::getNullValue(type);
                     }
